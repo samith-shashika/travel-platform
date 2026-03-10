@@ -9,9 +9,10 @@ async function getUser(session) {
 }
 
 export async function GET(request, { params }) {
+  const { id } = await params;
   try {
     await connectDB();
-    const listing = await Listing.findById(params.id).lean();
+    const listing = await Listing.findById(id).lean();
     if (!listing) return NextResponse.json({ error: "Listing not found" }, { status: 404 });
     return NextResponse.json({ listing });
   } catch (error) {
@@ -20,12 +21,13 @@ export async function GET(request, { params }) {
 }
 
 export async function PUT(request, { params }) {
+  const { id } = await params;
   try {
     const session = await getServerSession();
     if (!session) return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
 
     await connectDB();
-    const listing = await Listing.findById(params.id);
+    const listing = await Listing.findById((await params).id);
     if (!listing) return NextResponse.json({ error: "Listing not found" }, { status: 404 });
 
     const user = await getUser(session);
@@ -37,7 +39,7 @@ export async function PUT(request, { params }) {
       return NextResponse.json({ error: "All fields except price are required" }, { status: 400 });
 
     const updated = await Listing.findByIdAndUpdate(
-      params.id,
+      (await params).id,
       { title: title.trim(), location: location.trim(), imageUrl: imageUrl.trim(), description: description.trim(), price: price ? parseFloat(price) : null },
       { new: true }
     );
@@ -49,19 +51,20 @@ export async function PUT(request, { params }) {
 }
 
 export async function DELETE(request, { params }) {
+  const { id } = await params;
   try {
     const session = await getServerSession();
     if (!session) return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
 
     await connectDB();
-    const listing = await Listing.findById(params.id);
+    const listing = await Listing.findById((await params).id);
     if (!listing) return NextResponse.json({ error: "Listing not found" }, { status: 404 });
 
     const user = await getUser(session);
     if (listing.creator.toString() !== user._id.toString())
       return NextResponse.json({ error: "Not your listing" }, { status: 403 });
 
-    await Listing.findByIdAndDelete(params.id);
+    await Listing.findByIdAndDelete((await params).id);
     return NextResponse.json({ message: "Listing deleted" });
   } catch (error) {
     return NextResponse.json({ error: "Failed to delete listing" }, { status: 500 });
@@ -69,12 +72,13 @@ export async function DELETE(request, { params }) {
 }
 
 export async function PATCH(request, { params }) {
+  const { id } = await params;
   try {
     const session = await getServerSession();
     if (!session) return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
 
     await connectDB();
-    const listing = await Listing.findById(params.id);
+    const listing = await Listing.findById((await params).id);
     if (!listing) return NextResponse.json({ error: "Listing not found" }, { status: 404 });
 
     const user = await getUser(session);

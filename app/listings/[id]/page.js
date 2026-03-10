@@ -1,11 +1,12 @@
 "use client";
-import { useState, useEffect } from "react";
+import { use, useState, useEffect } from "react";
 import { useSession } from "next-auth/react";
 import { useRouter } from "next/navigation";
 import Link from "next/link";
 import { formatDistanceToNow } from "date-fns";
 
 export default function ListingDetailPage({ params }) {
+  const { id } = use(params);
   const { data: session } = useSession();
   const router = useRouter();
   const [listing, setListing] = useState(null);
@@ -19,7 +20,7 @@ export default function ListingDetailPage({ params }) {
   useEffect(() => {
     const fetchListing = async () => {
       try {
-        const res = await fetch(`/api/listings/${params.id}`);
+        const res = await fetch(`/api/listings/${id}`);
         const data = await res.json();
         if (!res.ok) { router.push("/feed"); return; }
         setListing(data.listing);
@@ -34,13 +35,13 @@ export default function ListingDetailPage({ params }) {
       }
     };
     fetchListing();
-  }, [params.id, session, router]);
+  }, [id, session, router]);
 
   const handleLike = async () => {
     if (!session) { router.push("/login"); return; }
     setLikeLoading(true);
     try {
-      const res = await fetch(`/api/listings/${params.id}`, { method: "PATCH" });
+      const res = await fetch(`/api/listings/${id}`, { method: "PATCH" });
       const data = await res.json();
       setLiked(data.liked);
       setLikes(data.likes);
@@ -54,7 +55,7 @@ export default function ListingDetailPage({ params }) {
   const handleDelete = async () => {
     setDeleteLoading(true);
     try {
-      const res = await fetch(`/api/listings/${params.id}`, { method: "DELETE" });
+      const res = await fetch(`/api/listings/${id}`, { method: "DELETE" });
       if (res.ok) router.push("/feed");
     } catch (err) {
       console.error(err);

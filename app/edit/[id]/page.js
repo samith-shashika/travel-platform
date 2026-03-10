@@ -1,10 +1,11 @@
 "use client";
-import { useState, useEffect } from "react";
+import { use, useState, useEffect } from "react";
 import { useSession } from "next-auth/react";
 import { useRouter } from "next/navigation";
 import Link from "next/link";
 
 export default function EditPage({ params }) {
+  const { id } = use(params);
   const { data: session, status } = useSession();
   const router = useRouter();
   const [form, setForm] = useState({ title: "", location: "", description: "", price: "" });
@@ -19,7 +20,7 @@ export default function EditPage({ params }) {
   useEffect(() => {
     const fetchListing = async () => {
       try {
-        const res = await fetch(`/api/listings/${params.id}`);
+        const res = await fetch(`/api/listings/${id}`);
         const data = await res.json();
         if (!res.ok) { router.push("/feed"); return; }
         const l = data.listing;
@@ -33,7 +34,7 @@ export default function EditPage({ params }) {
       }
     };
     fetchListing();
-  }, [params.id, router]);
+  }, [id, router]);
 
   if (status === "loading" || fetching) return null;
   if (!session) { router.push("/login"); return null; }
@@ -76,14 +77,14 @@ export default function EditPage({ params }) {
       const imageUrl = await uploadImage();
       if (!imageUrl) { setLoading(false); return; }
 
-      const res = await fetch(`/api/listings/${params.id}`, {
+      const res = await fetch(`/api/listings/${id}`, {
         method: "PUT",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ ...form, imageUrl, price: form.price ? parseFloat(form.price) : null }),
       });
       const data = await res.json();
       if (!res.ok) return setError(data.error);
-      router.push(`/listings/${params.id}`);
+      router.push(`/listings/${id}`);
     } catch {
       setError("Something went wrong. Please try again.");
     } finally {
@@ -103,7 +104,7 @@ export default function EditPage({ params }) {
         <div className="absolute inset-0 bg-black/60" />
         <div className="absolute inset-0 flex items-center px-6 md:px-10">
           <div>
-            <Link href={`/listings/${params.id}`} className="text-white/60 text-sm hover:text-white transition-colors">
+            <Link href={`/listings/${id}`} className="text-white/60 text-sm hover:text-white transition-colors">
               ← Back to listing
             </Link>
             <h1 className="text-3xl font-black text-white mt-1">Edit Experience</h1>
@@ -142,7 +143,7 @@ export default function EditPage({ params }) {
               <label className="block text-sm font-bold text-gray-700 mb-2">Experience Title <span className="text-red-400">*</span></label>
               <input
                 type="text" name="title" value={form.title}
-                onChange={handleChange} placeholder="e.g. Sunset Boat Tour in Bali" required
+                onChange={handleChange} placeholder="e.g. Sigiriya Rock Fortress Hike" required
                 className="w-full border border-gray-200 text-gray-900 placeholder-gray-400 px-4 py-3 rounded-xl focus:outline-none focus:ring-2 focus:ring-amber-400 text-sm"
               />
             </div>
@@ -156,7 +157,7 @@ export default function EditPage({ params }) {
                 </svg>
                 <input
                   type="text" name="location" value={form.location}
-                  onChange={handleChange} placeholder="e.g. Bali, Indonesia" required
+                  onChange={handleChange} placeholder="e.g. Sigiriya, Sri Lanka" required
                   className="w-full border border-gray-200 text-gray-900 placeholder-gray-400 pl-11 pr-4 py-3 rounded-xl focus:outline-none focus:ring-2 focus:ring-amber-400 text-sm"
                 />
               </div>
@@ -189,7 +190,7 @@ export default function EditPage({ params }) {
             {/* Buttons */}
             <div className="flex gap-3">
               <Link
-                href={`/listings/${params.id}`}
+                href={`/listings/${id}`}
                 className="flex-1 bg-gray-100 hover:bg-gray-200 text-gray-700 font-bold py-4 rounded-2xl transition-colors text-base text-center"
               >
                 Cancel

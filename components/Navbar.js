@@ -28,7 +28,7 @@ export default function Navbar() {
               <span className="text-white/60 text-sm">Hi, {session.user.name.split(" ")[0]}</span>
               <button
                 onClick={() => signOut({ callbackUrl: "/" })}
-                className="bg-white/10 hover:bg-white/20 text-white text-sm font-medium px-4 py-2 rounded-full transition-colors border border-white/20"
+                className="bg-white/10 hover:bg-white/20 text-white text-sm font-medium px-4 py-2 rounded-full transition-colors border border-white/20 cursor-pointer"
               >
                 Sign Out
               </button>
@@ -63,7 +63,7 @@ export default function Navbar() {
           {session ? (
             <>
               <Link href="/create" onClick={() => setOpen(false)} className="block text-white/80 hover:text-white py-2 text-sm">List Experience</Link>
-              <button onClick={() => { signOut({ callbackUrl: "/" }); setOpen(false); }} className="block text-red-400 py-2 text-sm">Sign Out</button>
+              <button onClick={() => { signOut({ callbackUrl: "/" }); setOpen(false); }} className="block text-red-400 py-2 text-sm cursor-pointer">Sign Out</button>
             </>
           ) : (
             <>
