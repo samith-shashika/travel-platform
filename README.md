@@ -33,7 +33,7 @@ Wandr is a full-stack web platform where travel experience providers can create 
 
 ### 1. Clone the repository
 ```bash
-git clone https://github.com/YOUR_USERNAME/travel-platform.git
+git clone https://github.com/samith-shashika/travel-platform.git
 cd travel-platform
 ```
 
